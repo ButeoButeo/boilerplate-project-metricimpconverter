@@ -81,9 +81,11 @@ function splitter(str) {
   let args = strObj.str.split(',');
   args = args.map(function(a){
     let m = a.match(/__#(\d+)/);
+    console.log(m)
     while (m) {
       a = a.replace(/__#(\d+)/, strObj.dictionary[m[1]]);
       m = a.match(/__#(\d+)/);
+      console.log(m)
     }
     return a.trim();
   })
@@ -118,8 +120,10 @@ function assertionAnalyser(body) {
   let assertionBodies = [];
   let methods = assertions.map(function(a, i){
     let m = a.match(/^\s*\.\s*(\w+)__#(\d+)/);
+    console.log(m)
     assertionBodies.push(parseInt(m[2]));
     let pre = splittedAssertions[i].match(/browser\s*\.\s*/) ? 'browser.' : '';
+    console.log(pre)
     return pre + m[1];
   });
   if(methods.some(function(m){ return !m })) return "invalid assertion";

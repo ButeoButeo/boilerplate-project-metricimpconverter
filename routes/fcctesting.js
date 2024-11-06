@@ -63,11 +63,11 @@ module.exports = function (app) {
     if(process.env.NODE_ENV === 'test') return next();
     res.json({status: 'unavailable'});
   },
-  function(req, res, next){
+  async function(req, res, next){
     if(!runner.report) return next();
-    res.json(testFilter(runner.report, req.query.type, req.query.n));
+    res.json(await testFilter(runner.report, req.query.type, req.query.n));
   },
-  function(req, res){
+  async function(req, res){
     runner.on('done', function(report){
       process.nextTick(() =>  res.json(testFilter(runner.report, req.query.type, req.query.n)));
     });
@@ -75,6 +75,7 @@ module.exports = function (app) {
   app.get('/_api/app-info', function(req, res) {
     let hs = Object.keys(res._headers)
       .filter(h => !h.match(/^access-control-\w+/));
+    console.log(hs)
     let hObj = {};
     hs.forEach(h => {hObj[h] = res._headers[h]});
     delete res._headers['strict-transport-security'];
@@ -83,14 +84,16 @@ module.exports = function (app) {
   
 };
 
-function testFilter(tests, type, n) {
+async function testFilter(tests, type, n) {
   let out;
   switch (type) {
     case 'unit' :
-      out = tests.filter(t => t.context.match('Unit Tests'));
+      out = tests.filter(t => t.context.match('unit tests'));
+      console.log(out)
       break;
     case 'functional':
-      out = tests.filter(t => t.context.match('Functional Tests') && !t.title.match('#example'));
+      out = tests.filter(t => t.context.match('functional tests') && !t.title.match('#example'));
+      console.log(out)
       break;
     default:
       out = tests;
